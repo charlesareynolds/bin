@@ -1,0 +1,3 @@
+# the csh keep xterm from exiting:
+xterm -e "echo Parameters:; echo \"$*\"; env | grep NAUTILUS;csh"
+
