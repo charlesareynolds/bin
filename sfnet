@@ -1,0 +1,1 @@
+xterm -n SFNet -sb -e telnet 204.162.177.1 &

@@ -1,0 +1,21 @@
+echo "${USER} group, gid, user count:"
+
+foreach line ( `ypcat group | grep ${USER}` )
+  echo -n `echo "${line}" | cut -d: -f3`,
+  echo -n `echo "${line}" | cut -d: -f1`,
+  echo    `echo "${line}" | cut -d: -f4-100 | tr ',' ' ' | wc -w`
+end
+
+
+# 
+# examples:
+#  source ~/my_group_stats | sort -k 1n -t, 
+#
+# ypcat group | grep ${USER} | sort -n -k 3 -t: | tr ':' '\012' | more
+
+
+
+
+
+
+

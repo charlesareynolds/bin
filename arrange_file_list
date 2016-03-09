@@ -1,0 +1,21 @@
+#!/bin/csh
+# This script takes  a file containing the results of a "Copy Selected Names" 
+# command in Apex, puts each "word" (fully qualified file name) on a 
+# separate line, then sorts the file.
+# 
+# $1 is the file name.
+
+set TEMPFILE="$1.temp"
+
+if ( -e ${TEMPFILE} ) rm ${TEMPFILE}
+
+touch ${TEMPFILE}
+
+foreach name (`cat $1`) 
+  echo ${name} >> ${TEMPFILE}
+end
+
+cp ${TEMPFILE} $1
+rm ${TEMPFILE}
+
+sort_file $1

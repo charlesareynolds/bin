@@ -1,0 +1,3 @@
+#!/bin/sh
+rup -lth > $HOME/temp_rup_$$
+xedit $HOME/temp_rup_$$

@@ -1,0 +1,44 @@
+#!/bin/sh
+#
+# Lists all the occurrences of a library (including other versions) in 
+# $LD_LIBRARY_PATH and the default dirs /lib and /usr/lib.
+
+found_one="FALSE"
+
+listIt () {
+  # wildcards can get expanded into multiple parms, so be sure to use "$@":
+  ls -d -F -l -1 "$@" 2> /dev/null
+  if [ $? = 0 ]
+  then
+    found_one="TRUE" 
+  fi
+}
+
+default_lib_dirs=":/usr/lib:/usr/local/lib"
+
+# Add the defaults if they are not already there:
+echo ${LD_LIBRARY_PATH} | grep ${default_lib_dirs} > /dev/null
+if [ $? ]
+then
+  search_path=${LD_LIBRARY_PATH}
+else
+  search_path=${LD_LIBRARY_PATH}${default_lib_dirs}
+fi
+
+search_path=`echo ${search_path} | tr ':' ' '`
+
+for dir in ${search_path}
+do
+  listIt ${dir}/${1}
+  listIt ${dir}/${1}.*
+  listIt ${dir}/lib${1}
+  listIt ${dir}/lib${1}.*
+  listIt ${dir}/lib${1}-*.*
+done
+
+if [ ${found_one} = "TRUE" ]
+then
+  exit 0
+else
+  exit 1
+fi

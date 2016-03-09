@@ -1,0 +1,3 @@
+cd /home/reynolds/storage/install/ImageMagick/bin
+convert vid:$1/* $1/directory.jpg
+

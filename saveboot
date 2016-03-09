@@ -1,0 +1,23 @@
+#!/bin/sh
+#saveboot
+
+if [ $# -ne 1 ]
+then
+  echo "One parameter required."
+  exit 1
+fi
+
+if [ ! -d /people/car/boot/$1 ]
+then
+  mkdir /people/car/boot/$1
+fi
+
+cp /people/car/.login /people/car/boot/$1
+cp /people/car/.cshrc /people/car/boot/$1
+cp /people/car/.Xdefaults /people/car/boot/$1
+cp /people/car/.mwmrc /people/car/boot/$1
+cp /people/car/.xinitrc /people/car/boot/$1
+cp /people/car/.zmailrc /people/car/boot/$1
+
+
+echo saved current boot info in boot/$1

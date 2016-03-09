@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# Lists the first occurrence of a particular library in
+# $LD_LIBRARY_PATH and the default dirs /lib and /usr/lib.
+
+lib=$1
+lib_dirs=`echo ${LD_LIBRARY_PATH} | tr ':' ' '`
+lib_dirs="${lib_dirs} /lib /usr/lib"
+
+for dir in ${lib_dirs}
+do
+  ls ${dir}/${lib} 2> /dev/null
+  if [ $? -eq 0 ]
+  then
+    # Found it!
+    exit 0
+  fi
+done
+
+# Didn't find it.
+exit -1

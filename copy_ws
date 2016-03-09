@@ -1,0 +1,3 @@
+
+
+(cd /home/reynolds/workspaces/iccs2_unix_gnat-6.0.2; tar -cf - *; cd /home/reynolds/workspaces/iccs2_sol_gnat-6.1.1) | tar -xvf -

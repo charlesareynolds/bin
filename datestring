@@ -1,0 +1,3 @@
+#!/bin/sh -f
+
+date +%Y_%m_%d__%H.%M.%S

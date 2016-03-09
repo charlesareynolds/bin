@@ -1,0 +1,68 @@
+#!/bin/sh
+# Go get all the uptimes from the network, and start doing load-monitoring on the least-used ones, 
+# skipping those we have no permissions for.
+
+DISPLAY="MAYCE:0.0"
+SIZE="100"
+RIGHT_OFFSET="0"
+MAX_COUNT="10"
+COUNT="0"
+
+# Clean up any previous mess:
+rm $HOME/temp_rup_*
+
+# Get all the uptimes, with a zero load average, in uptime order longest first:
+rup -t | grep "0.00, 0.00, 0.00" > $HOME/temp_rup_$$
+
+# Loop through the machine names:
+# Names changed - this is obsolete:
+# for MACHINE in `awk 'BEGIN {print $1}' $HOME/temp_rup_$$`
+for MACHINE in `awk -F"." 'BEGIN {print $1}' $HOME/temp_rup_$$`
+do
+
+  # skip these:
+  if [\
+ 	${MACHINE} = ekalaka -o \
+ 	${MACHINE} = emerald -o \
+ 	${MACHINE} = sherlock -o \
+	${MACHINE} = rational2 -o \
+	${MACHINE} = aaron -o \
+	${MACHINE} = collecting ]
+  then 
+    continue
+  fi
+
+  echo "==================================="; 
+  echo ${MACHINE}:
+  rsh ${MACHINE} w
+
+  # Did it work?
+  if [ $? -eq 0 ]
+  then
+    USER_COUNT=`rsh ${MACHINE} users | wc -w`
+
+    # Skip this one if there's too many users on it:
+    if [ $USER_COUNT -gt 0 ]
+    then
+      continue;
+    fi # end if [ $USER_COUNT -gt 0 ]
+
+    rsh ${MACHINE} xload \
+  	-title ${MACHINE} \
+	-scale 3 \
+	-display ${DISPLAY} \
+	-geometry ${SIZE}x${SIZE}-${RIGHT_OFFSET}-0 & 
+
+    RIGHT_OFFSET=`expr ${RIGHT_OFFSET} + ${SIZE} + 15`
+    COUNT=`expr $COUNT + 1`
+
+    if [ $COUNT -gt $MAX_COUNT ]
+    then
+      exit;
+    fi # end if [ $COUNT -gt $MAX_COUNT ]
+
+  fi # end if [ $? -eq 0 ]
+
+done # end for MACHINE...
+
+rm $HOME/temp_rup_$$

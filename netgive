@@ -1,0 +1,139 @@
+#!/bin/sh
+#
+# $Id: netgive,v 1.2 1991/08/26 17:03:38 rob Exp $
+#
+# Simple script to transfer files to the network transfer directory
+#
+# $Log: netgive,v $
+# Revision 1.2  1991/08/26  17:03:38  rob
+# Converted from /bin/csh to /bin/sh
+# Connect directly to the VAX instead of the gateway
+# Try multiple paths
+# Added logging to system log - success or failure
+#
+# Revision 1.1  1991/02/05  15:10:07  rob
+# Initial revision
+#
+my_name=`basename $0`
+
+# set the network directory parameters
+
+nodes="ssvax1 ssvax2"
+nuser="UNISERVE"
+
+# find a node that's up
+
+for node in $nodes; do
+    ping $node > /dev/null && break                                    # <<sun>>
+#   /etc/ping $node -n 2 | grep "100% packet loss" >/dev/null || break # <<hp>>
+done
+
+# did we get one?
+
+if [ $? -eq 0 ]; then
+    logger -p local3.info "$my_name using $node"
+else
+    echo "$my_name: unable to connect to the network transfer directory"
+    logger -p local3.info "$my_name failed, no path to NTD"
+    exit 1
+fi
+
+# start the ftp script
+
+cat <<THEND >/tmp/$$_ftp_script
+open $node
+user $nuser
+THEND
+
+# get the name of the files to transfer
+
+nfiles=0
+
+if [ $# -eq 0 ]; then
+
+  while [ 1 ]
+  do
+    echo -n "File to give [<cr> to send]: "
+    read filename
+
+    [ $filename ] || break
+
+    if [ -d $filename ]; then
+      echo "$my_name: $filename is a directory - skipping"
+      continue
+    fi
+
+    if [ -f $filename ]; then
+      nfiles=1
+
+      check-recl $filename
+      if [ $? -eq 1 ]; then
+         echo binary >>/tmp/$$_ftp_script
+      else
+         echo ascii >>/tmp/$$_ftp_script
+      fi
+
+      echo "put ${filename} `basename ${filename}`" >>/tmp/$$_ftp_script
+
+    else
+      echo "$my_name: file does not exist!"
+    fi
+  done
+
+else
+  while [ $# -gt 0 ]
+  do
+    filename=$1
+    shift
+
+    if [ -d $filename ]; then
+      echo "$my_name: $filename is a directory - skipping"
+      continue
+    fi
+
+    if [ -f $filename ]; then
+      nfiles=1
+
+      check-recl $filename
+      if [ $? -eq 1 ]; then
+        echo binary >>/tmp/$$_ftp_script
+      else
+        echo ascii >>/tmp/$$_ftp_script
+      fi
+
+      echo "put ${filename} `basename ${filename}`" >>/tmp/$$_ftp_script
+
+    else
+      echo "$my_name: file does not exist - $filename"
+    fi
+  done
+fi
+
+# make sure we got some files
+
+if [ $nfiles -eq 0  ]; then
+  rm -f /tmp/$$_ftp_script
+  echo "$my_name: no files specified"
+  exit 1
+fi
+
+# transfer the files
+
+echo bye >>/tmp/$$_ftp_script
+
+ftp -n </tmp/$$_ftp_script >/tmp/$$_aftp
+
+# check for success
+
+if [ -s /tmp/$$_aftp -a -n "`cat /tmp/$$_aftp`" ]; then
+  echo "$my_name: possible problems with transfer -"
+  cat /tmp/$$_aftp
+  mv /tmp/$$_aftp /tmp/$$_problems
+else
+  echo "$my_name: transfer suceeded"
+  rm -f /tmp/$$_aftp
+fi
+
+# clean up
+
+rm -f /tmp/$$_ftp_script

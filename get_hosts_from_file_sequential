@@ -1,0 +1,10 @@
+#!/bin/sh
+#ypcat hosts | awk '{print $2}' | sort -u > $HOME/temp_rup_$$
+#nano $HOME/temp_rup_$$
+
+for host in `cat $1`
+do
+  cmd="rsh ${host} uname -a"
+  echo doing ${cmd}
+  ${cmd} 
+done

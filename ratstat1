@@ -1,0 +1,14 @@
+#/bin/sh -f
+
+#/nif/rational/base/cots/flexlm.6.0i/sun4_solaris2/lmstat -c /nif/rational/config/license.dat -A
+#/nif/rational/base/cots/flexlm.6.0i/sun4_solaris2/lmstat -c /nif/rational/config/license.dat -a
+
+# /nif/rational/base/cots/flexlm.6.0i/sun4_solaris2/lmstat -c /nif/rational/config/license.dat -f ada.sun4
+# /nif/rational/base/cots/flexlm.6.0i/sun4_solaris2/lmstat -c /nif/rational/config/license.dat -f apex.sun4.vw_power.rada
+# /nif/rational/base/cots/flexlm.6.0i/sun4_solaris2/lmstat -c /nif/rational/config/license.dat -f env_base.sun4
+# /nif/rational/base/cots/flexlm.6.0i/sun4_solaris2/lmstat -c /nif/rational/config/license.dat -f rci.sun4
+# /nif/rational/base/cots/flexlm.6.0i/sun4_solaris2/lmstat -c /nif/rational/config/license.dat -f summit_base.sun4
+ /nif/rational/base/cots/flexlm.6.0i/sun4_solaris2/lmstat -c /nif/rational/config/license.dat -f summit_cm.sun4
+#
+#
+

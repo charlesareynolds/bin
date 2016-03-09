@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# Lists all the occurrences of a file in $PATH
+
+for dir in `echo ${PATH} | tr ':' ' '`
+do
+  ls -d -F -l -1 ${dir}/$1 2> /dev/null
+done

@@ -1,0 +1,33 @@
+echo "group, gid, user count:"
+
+foreach line ( `ypcat group` )
+  echo -n `echo "${line}" | cut -d: -f3`,
+  echo -n `echo "${line}" | cut -d: -f1`,
+  echo    `echo "${line}" | cut -d: -f4-100 | tr ',' ' ' | wc -w`
+end
+
+
+# if ( -f group_nums ) then
+#   rm group_nums
+# endif
+#
+# ypcat group | cut -d: -f3 | sort -nu > group_nums
+# 
+# foreach num ( `cat group_nums` )
+# #  echo ${num}
+#   set user_count=`ypcat group | grep :${num}: | tr ',' ' ' | wc -w`
+# #  ypcat group | grep :${num}: | tr ',' ' ' | wc -w
+# #  user_count=`ypcat group | grep ${num}: | grep ","`
+#   echo ${num}:${user_count}
+# end
+# 
+# examples:
+# put those with the fewest users first:
+#  source ~/group_stats | sort -k 3n -t,
+#  source ~/group_stats | sort -k 1n -t, | sort -k 3n -t,
+
+
+
+
+
+

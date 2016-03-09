@@ -1,0 +1,150 @@
+#!/bin/sh
+#
+# $Id: nettake,v 1.3 1991/08/26 17:03:38 rob Exp $
+#
+# Simple script to transfer files from the network transfer directory
+#
+# $Log: nettake,v $
+# Revision 1.3  1991/08/26  17:03:38  rob
+# Converted from /bin/csh to /bin/sh
+# Connect directly to the VAX instead of the gateway
+# Try multiple paths
+#
+# Added logging to system log - success or failure
+# Added copy-only options - doesn't delete file in NTD
+#
+# Revision 1.2  1991/03/21  14:15:59  rob
+# Added -b option for binary file transfers
+#
+# Revision 1.1  91/02/05  15:10:35  rob
+# Initial revision
+# 
+my_name=`basename $0`
+
+# set the network directory parameters
+
+nodes="ssvax1 ssvax2"
+nuser="UNISERVE"
+
+# find a node that's up
+
+for node in $nodes; do
+    ping $node > /dev/null && break                                    # <<sun>>
+#   /etc/ping $node -n 2 | grep "100% packet loss" >/dev/null || break # <<hp>>
+done
+
+# did we get one?
+
+if [ $? -eq 0 ]; then
+    logger -p local3.info "$my_name using $node"
+else
+    echo "$my_name: unable to connect to the network transfer directory"
+    logger -p local3.info "$my_name failed, no path to NTD"
+    exit 1
+fi
+
+# start the ftp script
+
+cat <<THEND >/tmp/$$_ftp_script
+open $node
+user $nuser
+THEND
+
+# check arguments until we run out of options
+
+options=1
+delete=1
+
+while [ $options -eq 1 -a $# -gt 0 ]
+do
+
+    case $1 in
+
+      -b)                                    # image transfer mode
+        shift
+        echo binary >>/tmp/$$_ftp_script;;
+
+      -c)                                    # copy only, don't delete
+        shift
+        delete=0;;
+
+      -*)                                    # huh?!?
+        echo "$my_name: unknown option $1"
+        exit 1;;
+
+       *)
+        options=0
+
+    esac
+
+done
+
+# get the name of the files to transfer
+
+nfiles=0
+
+if [ $# -eq 0 ]; then
+
+  while [ 1 ] 
+  do
+    echo -n "File to take [<cr> to execute]: "
+    read filename
+
+    [ $filename ] || break
+    nfiles=1
+
+    echo "get ${filename} ${filename}" >>/tmp/$$_ftp_script
+    [ $delete -eq 1 ] && echo "delete ${filename}" >>/tmp/$$_ftp_script
+
+  done
+
+else
+  while [ $# -gt 0 ]
+  do
+    filename=$1
+    shift
+
+    nfiles=1
+
+    echo "get ${filename} ${filename}" >>/tmp/$$_ftp_script
+    [ $delete -eq 1 ] && echo "delete ${filename}" >>/tmp/$$_ftp_script
+
+  done
+fi
+
+# make sure we got some files
+
+if [ $nfiles -eq 0 ]; then
+  rm -f /tmp/$$_ftp_script
+  echo "$my_name: no files specified"
+  exit 1
+fi
+
+# transfer the files
+
+echo bye >>/tmp/$$_ftp_script
+
+ftp -n </tmp/$$_ftp_script >/tmp/$$_aftp
+
+# check for success
+
+if [ -s /tmp/$$_aftp -a -n "`cat /tmp/$$_aftp`" ]; then
+
+  grep -i "file not found" /tmp/$$_aftp > /dev/null
+
+  if [ $? -eq 0 ]; then
+    echo "$my_name: not all the files requested were in the transfer directory"
+  else
+    echo "$my_name: possible problems with transfer -"
+    cat /tmp/$$_aftp
+    mv /tmp/$$_aftp /tmp/$$_problems
+  fi
+
+else
+  echo "$my_name: transfer suceeded"
+  rm -f /tmp/$$_aftp
+fi
+
+# clean up
+
+rm -f /tmp/$$_ftp_script

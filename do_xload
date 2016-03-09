@@ -1,0 +1,12 @@
+#!/bin/sh
+# Usage:
+# do_load <machine>
+
+SIZE="100"
+
+  rsh $1 xload \
+	-title $1 \
+	-scale 3 \
+	-display ${DISPLAY} \
+	-geometry ${SIZE}x${SIZE}-0-0 &
+

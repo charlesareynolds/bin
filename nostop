@@ -1,0 +1,3 @@
+ls
+echo "Type Ctrl-D to exit"
+cat

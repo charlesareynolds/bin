@@ -1,0 +1,9 @@
+#! /bin/sh
+# ypcensustest - poll for ypservers
+
+ for h in `ypcat hosts | awk '{print $2}'`
+  do
+	echo "ypwhich on $h:"
+	ypwhich $h
+#
+  done   

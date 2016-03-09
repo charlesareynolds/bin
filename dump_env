@@ -1,0 +1,52 @@
+# Dump the contents of the current environment, for the purpose of comparing 
+# an Apex-controlled 7.2.1 environment against an AccuRev-controlled 7.2.2 environment.
+
+echo begin dump_env $1
+set env_file=~/dump_env_$1_`date +%Y-%m-%d_%H:%M:%S`.log
+echo "env_file: ${env_file}"
+
+echo "----------------------------------------------------------------------" > ${env_file}
+echo "alias"                                                                  >> ${env_file}
+echo "----------------------------------------------------------------------" >> ${env_file}
+# These aliases were intentionally added:
+set ignore_added = '(^debug_paths|^echo_dashes|^echo_equals|^echo_path|^echo_var|^if_debug|^show_paths)'
+# These aliases were intentionally deleted:
+set ignore_deleted = '(^showlibpath|^showpath)'
+
+alias | \
+egrep -v $ignore_added | \
+egrep -v $ignore_deleted | \
+sort >> \
+${env_file}
+
+echo "----------------------------------------------------------------------" >> ${env_file}
+echo "set"                                                                    >> ${env_file}
+echo "----------------------------------------------------------------------" >> ${env_file}
+# This is too long to easily compare.  Check PATH instead:
+set ignore_others = '(^path)'
+# These variables are artifacts of this script:
+set ignore_artifacts = '(^argv|^ignore_added|^ignore_deleted|^ignore_artifacts|^ignore_others|^env_file)'
+
+set | \
+egrep -v $ignore_artifacts | \
+egrep -v $ignore_others | \
+sort >> \
+${env_file}
+
+echo "----------------------------------------------------------------------" >> ${env_file}
+echo "setenv"                                                                 >> ${env_file}
+echo "----------------------------------------------------------------------" >> ${env_file}
+# All the *_SETUP_DONE variables were intentionally removed:
+# Certain NIF_ variables were intentiaonally removed:
+set ignore_deleted = '(^SETENV_IS_DONE|SETUP_DONE|^WINDOWID|^NIF_ENVIRONMENT|^NIF_RATIONAL_CONFIG|^NIF_RATIONAL_CONFIG|^NIF_TOOLS_BIN)'
+
+# WINDOWID is always different:
+set ignore_others = '(SETUP_DONE|^WINDOWID)'
+
+setenv | \
+egrep -v $ignore_deleted | \
+egrep -v $ignore_others | \
+sort | \
+tr ":" "\012" >> \
+${env_file}
+

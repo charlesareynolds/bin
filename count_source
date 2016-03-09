@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# This script lists the number of *.a* files in a directory (should be .ada and .asm)
+# and counts the total number of lines.
+
+echo "File count:"
+ls $1/*.a* | wc -w
+
+echo "Line Count:"
+wc -l $1/*.a* | tail -1
+

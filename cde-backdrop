@@ -1,0 +1,206 @@
+#!/bin/sh
+
+#
+# cde-backdrop
+# Copyright © 2002 Thomas A. Fine
+# License is hereby granted to redistribute for any use (commercial or
+# otherwise), in whole or in part, provided only that this copyright and
+# license are preserved.
+#
+# Version 1.0 Fri Sep  6 15:24:49 EDT 2002
+#
+# For the latest version and additional information:
+#    http://hea-www.harvard.edu/~fine/Tech/cde-backdrop.html
+#
+# To Install:
+#    1. stick this file in your path
+#    2. edit the PATH line below to add additional directories needed
+#       to find xprop, xloadimage, xwininfo, djpeg, or tifftopnm
+#    3. Make sure the file is executable
+#
+PATH=/soft/netpbm/bin:/usr/local/bin:$PATH
+
+if [ $# -eq 1 ]
+then
+  targetws=""
+  image=$1
+elif [ $# -eq 2 ]
+then
+  targetws=$1
+  image=$2
+else
+  echo "usage: $0 "'[ workspace | -select ] image-file'
+  echo '    "workspace" can be the name shown on the front panel button or'
+  echo '    a string of the form ws<N>, where <N> is a number starting at 0.'
+  echo '    If "-select" is chosen, you must click the mouse on the background.'
+  echo '    If no workspace is given, the current workspace is used.'
+  echo "  $0 "'-list'
+  echo '    List all available workspaces (for use with other programs).'
+  echo "  $0 "'[ workspace | -select ] -id'
+  echo '    Show the window id of the cde backdrop for the selected workspace.'
+  exit 1
+fi
+
+
+setvalues() {
+  tmpws=$1
+  shift
+  eval ${tmpws}_backdrop="$7"
+  eval ${tmpws}_name=\""$1"\"
+}
+
+name2ws() {
+  for ws in $WS_list
+  do
+    eval tmp_name=\$${ws}_name
+    if [ "$tmp_name" = "$1" ]
+    then
+      echo $ws
+      return 0
+    fi
+  done
+  return 1
+}
+
+name2backdrop() {
+  for ws in $WS_list
+  do
+    eval tmp_name=\$${ws}_name
+    if [ "$tmp_name" = "$1" ]
+    then
+      eval echo \$${ws}_backdrop
+      return 0
+    fi
+  done
+  return 1
+}
+
+
+find_ws_backdrop() {
+  # The _MOTIF_WM_INFO property of the root window points to another
+  # window where we can find workspace info
+  # Similar but less complete info can be found by checking the props from
+  # the window referred to by _SUN_SdtWmCommPropWindow
+  win=`xprop -notype -root _MOTIF_WM_INFO | awk '{ print $4 }'`
+  # Now we get the properties of this new window
+  info="`xprop -notype -id $win`"
+  # Extract the current workspace id from the appropriate property
+  WS_current=`echo "$info" | grep _DT_WORKSPACE_CURRENT | awk '{ print $3 }'`
+  # Extract a list of all workspaces from the appropriate property
+  WS_list=`echo "$info" | grep _DT_WORKSPACE_LIST | sed 's/^.* = //' | sed 's/,//g'`
+
+  # The _DT_WORKSPACE_INFO_ws0 property contains information on workspace
+  # ws0, including the name, and the backdrop window id.  The setvalues
+  # function (above) parses this property into the needed fields.
+  for ws in $WS_list
+  do
+    tmp_info="`echo "$info" | grep _DT_WORKSPACE_INFO_$ws | sed 's/^.* = //' | sed 's/,//g'`"
+    eval ${ws}_info=\'"$tmp_info"\'
+    eval setvalues $ws "$tmp_info"
+  done
+
+  if [ $# -eq 0 -o "$1" = "current" -o "$1" = "" ]
+  then
+    eval backdrop=\$${WS_current}_backdrop
+  else
+    backdrop=`name2backdrop "$1"`
+    if [ "$backdrop" = "" ]
+    then
+      case $1 in
+	ws[0-9])
+	  eval backdrop=\$${1}_backdrop
+	  ;;
+	*)
+	  backdrop=""
+	  ;;
+      esac
+    fi
+  fi
+  echo $backdrop
+}
+
+list_backdrops() {
+  # see comments in find_ws_backdrop()
+  win=`xprop -notype -root _MOTIF_WM_INFO | awk '{ print $4 }'`
+  info="`xprop -notype -id $win`"
+  echo "$info" | grep _DT_WORKSPACE_LIST | sed 's/^.* = //' | sed 's/,//g'
+}
+
+
+if [ "$image" = "-list" ]
+then
+  list_backdrops
+  exit 0
+fi
+
+if [ "$targetws" = "-select" ]
+then
+  echo Please click on the background...
+
+  #xwininfo: Window id: 0x3400028 (has no name)
+  winid=`xwininfo | grep 'Window id:' | sed 's/^.*Window id: //' | sed 's/ .*$//'`
+else
+  winid=`find_ws_backdrop $targetws`
+  if [ "$winid" = "" ]
+  then
+    echo "Can't find workspace called $targetws"
+    exit 1
+  fi
+fi
+
+if [ "$image" = "-id" ]
+then
+  echo $winid
+  exit 0
+fi
+
+case $image in
+  *.ppm | *.PPM | *.pgm | *.PGM | *.pbm | *.PBM )
+    CONVERT_COMMAND=cat
+    ;;
+  *.gif | *.GIF)
+    CONVERT_COMMAND=cat
+    ;;
+  *.jpg | *.JPG | *.jpeg | *.JPEG)
+    #latest xloadimage might handle JPEG directly (e.g. try using "cat")
+    CONVERT_COMMAND="djpeg -pnm"
+    ;;
+  *.tif | *.tiff | *.TIF | *.TIFF | *.Tiff)
+    #latest xloadimage might handle TIFF directly (e.g. try using "cat")
+    CONVERT_COMMAND=tifftopnm
+    ;;
+  *)
+    echo unrecognized file type, lets hope xloadimage supports it
+    CONVERT_COMMAND=cat
+    ;;
+esac
+
+# Prevent gamma correction:
+DISPLAY_GAMMA=1.0
+export DISPLAY_GAMMA
+
+$CONVERT_COMMAND $image | xloadimage -windowid $winid stdin
+
+
+## Also tried dtksh, but could only figure out how to get the current backdrop
+## window:
+##!/usr/dt/bin/dtksh
+#
+#textDISPLAY=$DISPLAY
+#
+#XtInitialize WIDGET wsInfo wsInfo
+#XtScreen SCREEN $WIDGET
+#XtDisplay DISPLAY $WIDGET
+#XRootWindowOfScreen ROOTWIN $SCREEN
+#
+#DtWsmGetWorkspaceList $DISPLAY $ROOTWIN WSLIST
+#DtWsmGetCurrentBackdropWindow $DISPLAY $ROOTWIN BDWIN
+#
+## workspace list (WSLIST) is a list of atoms, to get the names use:
+##XmGetAtomName tmp $DISPLAY $atom
+## to go in the other direction, use (example below for workspace 2)
+##XmInternAtom tmp $DISPLAY ws2 True
+#
+##This doesn't work - causes a core dump
+##DtWsmSetCurrentWorkspace $WIDGET $tmp
+

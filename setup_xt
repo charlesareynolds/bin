@@ -1,0 +1,8 @@
+
+# Starts up kern for use at X terminal
+
+setenv DISPLAY iccsxt1:0.0
+netscape -install &
+xbiff -geometry -0-0 &
+xload -scale 3 -geometry -0-100 &
+#apexinit 

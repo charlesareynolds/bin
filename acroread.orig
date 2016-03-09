@@ -1,0 +1,3 @@
+echo called /home/reynolds/bin/acroread $*
+echo calling /opt/local/SunOS/Acrobat5/bin/acroread $*
+/opt/local/SunOS/Acrobat5/bin/acroread $*

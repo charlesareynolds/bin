@@ -1,0 +1,5 @@
+rm $1/core
+rm $1_tar
+rm $1_tar.Z
+tar cvf $1_tar $1
+compress -v $1_tar

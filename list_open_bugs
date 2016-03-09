@@ -1,0 +1,43 @@
+#!/bin/csh
+
+source /nif/oracle/script/cora8setup
+
+sqlplus -s reynolds/willamette <<%end
+
+ttitle "Open Bugs Report";
+
+column product_name 			heading "Product|Name" format a12;
+column bug_title WORD_WRAPPED 		heading "Title" format a30;
+column date_submitted 			heading "Date|Submitted" format a9;
+column last_action_date 		heading "Last|Action" format a9;
+column log_number 			heading "Log|Number" format a8;
+column defect_number 			heading "Defect|Number" format a6;
+column priority 			heading "Priority" format a8;
+column whose_turn 			heading "Next|Action" format a8;
+column status WORD_WRAPPED 		heading "Status" format a16;
+column disposition 			heading "State" format a6;
+column additional_info WORD_WRAPPED	heading "Comments" format a10;
+
+set linesize 132;
+set pagesize 60;
+set newpage 0;
+set termout off;
+break on product_name skip 1;
+spool list_open_bugs.out;
+
+select product_name, 
+ priority,
+ log_number,  defect_number, 
+ bug_title, date_submitted, last_action_date, whose_turn,  
+ status, additional_info
+from bug_reports
+where disposition = 'OPEN'
+order by product_name, 
+ decode(priority, 'Critical',1,'High',2,'Medium',3,'med',3,'Low',4,'',5),
+ log_number;
+
+spool off;
+
+%end
+
+#lpr -landscape list_open_bugs.out

@@ -1,0 +1,7 @@
+#!/bin/sh
+# Usage:
+# do_uptime <machine>
+
+command="rsh $1 uptime"
+echo ${command}
+${command}

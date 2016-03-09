@@ -1,0 +1,8 @@
+#! /bin/sh
+# ypcensus - poll for ypservers
+
+( for h in `ypcat hosts | awk '{print $2}'`
+  do
+	ypwhich $h
+#  done ) | grep -v 'not bound' | sort | uniq -c
+  done )  | sort | uniq -c

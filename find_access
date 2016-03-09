@@ -1,0 +1,4 @@
+#!/bin/sh
+# Find all the access files rooted at the parameter.  Follow links, but not the .Rational_Location links:
+find $1 \( -name .Rational_Location -prune -follow \) -o \
+	\( -name 'EPC_access.dat' -print -follow -exec echo found \; \)

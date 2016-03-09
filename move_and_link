@@ -1,0 +1,18 @@
+#!/bin/sh
+# Must be run from an Apex xterm (calls apex).
+
+doit () {
+  executable=$1
+  source=`dirname ${executable}`/`basename ${executable} .omf`.2.ada
+  timestamp=`date '+%Y-%m-%d_%H.%M.%S'`
+  if [ -f ${executable} ]
+  then
+   mv ${executable} ${executable}.bak.${timestamp}
+  fi
+  apex link ${source}
+}
+
+for item in `cat $1`
+do
+  doit ${item}
+done

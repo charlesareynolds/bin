@@ -1,0 +1,19 @@
+#!/bin/sh
+HEIGHT="125"
+WIDTH="100"
+RIGHT_OFFSET="0"
+
+for machine in  $*
+do
+  echo doing xload for ${machine}
+  rsh ${machine} xload \
+	-title ${machine} \
+	-scale 4 \
+	-display ${DISPLAY} \
+	-geometry ${WIDTH}x${HEIGHT}-${RIGHT_OFFSET}-0 &
+
+# Use 85 to get above CDE window manager bar:
+#	-geometry ${WIDTH}x${HEIGHT}-${RIGHT_OFFSET}-85 &
+
+  RIGHT_OFFSET=`expr ${RIGHT_OFFSET} + ${WIDTH} + 5`
+done	

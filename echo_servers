@@ -1,0 +1,27 @@
+#!/bin/sh
+# These are the current (2010/12/16) ICCS "big boxes" - and linux machines
+# See https://nif-wiki.llnl.gov/display/iccs/Development+Machines
+echo \
+main-frame-dev1 \
+main-frame-dev2 \
+iccs-v240 \
+iccsdev0006 \
+deuce  \
+nif-controls-b490  \
+iccs-v480 \
+iccsdev0005 \
+superglide \
+nighttrain \
+iccsdev0001 \
+cmdev0003
+
+
+
+# Oracle VM iccsfwdev0001 \
+# Oracle VM iccsfwdev0002 \
+# Oracle VM iccsmgrdevbu31a \
+# brentwood \
+# sportster \
+
+#permission denied: stockton-b490 softtail
+#off: aa-dev3

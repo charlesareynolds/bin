@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# Counts the number of NIF subsystems
+
+base_dir="/nif/code"
+
+layers="\
+	Application_Behavior \
+	Application_Support \
+	Controllers \
+	Devices \
+	Framework_Services \
+	Framework_Templates \
+	Main_Programs \
+	Support" 
+	
+(for layer in ${layers}
+do
+  ls ${base_dir}/${layer} | grep .ss$
+done) | wc

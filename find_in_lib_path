@@ -1,0 +1,10 @@
+#!/bin/csh -f
+
+foreach dir (`echo ${#LD_LIBRARY_PATH} | sed 's/:/ /g'`)
+#  echo $dir
+  # ls $dir/*$1* >& /dev/null
+  # if ( $status == 1 ) 
+  # then
+    ls $dir/*$1* 
+  # endif
+end

@@ -1,0 +1,6 @@
+#!/bin/sh -f
+#
+# Two parameters : string and file name.
+# produces a new file without the lines containing String
+
+grep -v $1 $2 > $2.no_$1

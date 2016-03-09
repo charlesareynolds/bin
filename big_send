@@ -1,0 +1,9 @@
+#!/bin/sh
+TO=$1
+shift;
+touch ${HOME}/temp_$$
+##echo "~s BIG" >> ${HOME}/temp_$$
+/usr/5bin/banner $* >> ${HOME}/temp_$$
+mail ${TO} < ${HOME}/temp_$$
+rm ${HOME}/temp_$$
+

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# Make a hard link with a tld-acceptible name for all the .ada
+# files in this directory.
+
+for APEX_NAME in `ls *.ada` 
+do
+
+  TLD_NAME=`echo ${APEX_NAME} | sed 's/.ada/.a/'`
+  
+  if [ -f ${TLD_NAME} ]
+  then
+    echo "!!! ${TLD_NAME} exists.  No new link created for ${APEX_NAME}"
+  else  
+    ln ${APEX_NAME} ${TLD_NAME}
+    echo "+++ New link ${TLD_NAME} created for ${APEX_NAME}"
+  fi
+
+done

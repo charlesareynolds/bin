@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# list all the /etc/fstab files on all the machines
+
+echo "----------------------------------------------------------"
+echo "These are the filesystems imported on each machine."
+echo "----------------------------------------------------------"
+
+for MACHINE in `rup | awk '{print $1}' | awk '{FS = "."; print $1}'`
+# for MACHINE in `ypcat hosts | awk '{print $2}'`
+# for MACHINE in beacon ariel luna luce
+do
+  echo
+  echo "-----------------------------"
+  echo "$MACHINE:/etc/fstab:"
+  echo "-----------------------------"
+  rsh $MACHINE cat /etc/fstab | awk '/:/ {print}'
+done 
+

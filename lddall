@@ -1,0 +1,24 @@
+#!/bin/sh
+
+prog_or_lib=$1
+
+get_lib_paths () {
+  for third_col in `ldd ${prog_or_lib} | cut -d" " -f3`
+  do
+    if [ ${third_col} != "not" ]
+    then
+      echo ${third_col}
+    fi
+  done
+}
+
+echo "Listing dependencies of all libs in closure of:"
+echo "${prog_or_lib}"
+echo " "
+
+for lib_path in ${prog_or_lib} `get_lib_paths`
+do
+  echo "${lib_path}:"
+  ldd ${lib_path}
+  echo " "
+done

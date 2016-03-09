@@ -1,0 +1,24 @@
+rm -rf /g/g16/dawson/git-ats/sandbox/chaos_5_x86_64_ib; 
+
+cd /g/g16/dawson/git-ats/sandbox/Python-2.7.3; 
+
+./configure --prefix=/g/g16/dawson/git-ats/sandbox/chaos_5_x86_64_ib; 
+make clean; 
+make -j 4; 
+make install; 
+
+cd  /g/g16/dawson/git-ats/sandbox/Python-2.7.3/src/nose-1.2.1; 
+/g/g16/dawson/git-ats/sandbox/chaos_5_x86_64_ib/bin/python setup.py build; 
+/g/g16/dawson/git-ats/sandbox/chaos_5_x86_64_ib/bin/python setup.py install; 
+
+cd  /g/g16/dawson/git-ats/sandbox/Python-2.7.3/src/numpy-1.7.0; 
+/g/g16/dawson/git-ats/sandbox/chaos_5_x86_64_ib/bin/python setup.py build; 
+/g/g16/dawson/git-ats/sandbox/chaos_5_x86_64_ib/bin/python setup.py install; 
+
+cd /g/g16/dawson/git-ats; 
+/g/g16/dawson/git-ats/sandbox/chaos_5_x86_64_ib/bin/python setup.py install; 
+cd /g/g16/dawson/git-ats/LC; 
+/g/g16/dawson/git-ats/sandbox/chaos_5_x86_64_ib/bin/python setup.py install; 
+cd /g/g16/dawson/git-ats; 
+
+--- end of file ---

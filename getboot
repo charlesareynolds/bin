@@ -1,0 +1,13 @@
+#!/bin/sh
+# 
+# getboot
+#
+if [ -z "$1" ]
+then
+  echo "Usage: getboot <boot configutarion name>"
+else
+  cp ${HOME}/root/$1/* ${HOME}
+  cp ${HOME}/root/$1/.* ${HOME}
+  echo "Restored root directory contents from ${HOME}/root/$1:"
+  ls -al ${HOME}
+fi

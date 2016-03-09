@@ -1,0 +1,9 @@
+# test_source
+echo test_source2
+
+set sourcecommand=(!-1)
+set relscriptdirname=`/usr/bin/dirname ${sourcecommand[2]}`
+set absscriptdirname=`(cd ${relscriptdirname}; pwd)`
+echo ${absscriptdirname}
+set config_dir=`/usr/bin/dirname ${absscriptdirname}`
+echo ${config_dir}

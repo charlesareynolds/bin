@@ -1,0 +1,1 @@
+cs_hosts_run '/usr/etc/dmesg | grep -i mem | sort -u'

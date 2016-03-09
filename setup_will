@@ -1,0 +1,2 @@
+setenv DISPLAY willamette:0
+stty erase ^H

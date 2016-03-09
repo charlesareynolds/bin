@@ -1,0 +1,3 @@
+awk '{ORS = " "; print $2; print $3}' hosts.current | sort -t 
+
+#awk '{ORS = " ";print %1}' hosts.current.sorted

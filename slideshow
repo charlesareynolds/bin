@@ -1,0 +1,7 @@
+#!/bin/csh
+#
+# Slide Show w/ 10 minute cycle
+
+xv -maxpect -smooth -root -rmode 5 -random -wait 600 -wloop\
+~/storage/pics/slides/*/*.{gif,jpg,jpeg,JPEG} \
+&

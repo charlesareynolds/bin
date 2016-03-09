@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+#  looks for all addresses in a given 3-number prefix.
+
+for A in 0 1 
+do
+  for B in 0 1 2 3 4 5 6 7 8 9
+  do
+    for C in 0 1 2 3 4 5 6 7 8 9
+    do
+        ypmatch $1.$A$B$C hosts.byaddr 2> /dev/null
+    done
+  done
+done
+
+for A in 2 
+do
+  for B in 0 1 2 3 4 5 
+  do
+    for C in 0 1 2 3 4 5 6 7 8 9
+    do
+        ypmatch $1.$A$B$C hosts.byaddr 2> /dev/null
+    done
+  done
+done

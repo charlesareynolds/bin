@@ -1,0 +1,2 @@
+#cp /home/reynolds/storage/au/$1.au /dev/audio
+cp /home/reynolds/storage/au/$1.au /dev/sound/0
